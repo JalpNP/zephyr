@@ -1,0 +1,130 @@
+@import '../Common/Mixin.scss';
+
+
+.Register_main{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  padding: 20px 10px;
+  
+  background-image: linear-gradient(to bottom,#f8aaaabf,#EBAFAFBF,#FFFAFABF);
+
+  
+.reg_heading{
+
+  font-size: 25px;
+ padding: 20px 10px;
+  font-family: Jacques Francois;
+
+}
+
+.main{
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    gap: 40px;
+    width: 100%;
+    flex-flow: wrap;
+ 
+
+  
+    
+.Register_form{
+    background-image: linear-gradient(to bottom, #E0A8A84D , #E4EDF459);
+    border: none;
+    border-radius: 10px;
+    height: fit-content;
+
+padding: 20px 0;
+    width: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  flex-direction: column;
+
+
+  @include md{
+  width: fit-content;
+  padding: 10px;
+  }
+
+  @include mb{
+    width: fit-content;
+
+    }
+
+  input,textarea{
+      width: 243px;
+      padding: 10px;
+      border: none;
+      border-radius: 10px;
+      background-color: #851E1E73;
+
+      @include md{
+        width: 200px;
+      }
+
+      &::placeholder{
+        color: black;
+        font-family: Georgia, 'Times New Roman', Times, serif;
+        
+      }
+  }
+  
+  .reg_btn{
+    
+      border-radius: 10px;
+      background-color: #851E1E73;
+      color: black;
+      width: 259px;
+      padding: 10px;
+      border: 1px solid #851E1E73;
+
+      @include md{
+        width: 200px;
+      }
+
+      &:hover{
+        background-color: white;
+        border: 1px solid black;
+      }
+     
+  }
+}
+
+  .info{
+    background-image: linear-gradient(to bottom, #E0A8A84D , #E4EDF459);
+    border-radius: 10px;
+    height: fit-content;
+  width: 30%;
+  padding: 20px 10px ;
+    font-family: High Tower Text;
+  
+    @include md{
+     width: fit-content;
+    }
+    h3{
+      font-size: 20px;
+      text-align: center;
+       
+    }
+    
+    span{
+        font-size: 30px;
+        display: flex;
+        align-items: center;
+        padding: 10px 30px;
+        gap: 10px;
+    }
+
+    h4{
+        font-size: 20px;
+      
+    }
+}
+}
+  
+}
+

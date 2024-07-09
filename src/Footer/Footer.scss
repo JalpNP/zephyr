@@ -1,0 +1,169 @@
+@import '../Common/Mixin.scss';
+
+
+.title{
+    width: 100%;
+   
+   h3{ color: #18181B;
+    font-family: Plus Jakarta Sans;
+    font-size: 32px;
+    padding: 10px ;
+
+    @include md{
+        padding-left:20px ;
+    }
+   }
+
+ hr{
+    color: #E4E4E7;
+ }
+
+   .main{
+    display: flex;
+    justify-content: space-between;
+    border-top: 1px solid #E4E4E7;
+
+    @include md{
+        display: flex;
+        flex-flow: wrap;
+        justify-content: space-between;
+        padding: 20px 0;
+        padding-left: 20px;
+    }
+    .first{
+
+        padding: 0 10px;
+        h3{
+        font-family: Plus Jakarta Sans;
+        font-size: 20px;
+        }
+
+        p{
+            font-size: 18px;
+            width: 280px;
+
+            @include md{
+                width: 100%;
+            }
+        }
+        
+        span{
+            border: none;
+            padding: 9px;
+            cursor: pointer;
+           
+        
+        }
+        svg{
+            font-size: 20px;
+            
+          
+
+            &:hover{
+                font-size: 30px;
+                
+                border-color: #18181B;
+               color: blue ;
+               
+                transform: scale(1.2);
+                transition: 1s ease;
+            }
+        }
+    }
+
+    .news{
+      
+        h3{
+            font-family: Plus Jakarta Sans;
+            font-size: 20px;
+            }
+            .form{
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 20px;
+            }
+            form{
+
+              
+                label{
+                    font-family: Plus Jakarta Sans;
+
+                }
+                input{
+                    height: 20px;
+                }
+                button{
+                    border: 1px solid #f4acbd00;
+                    background-color: #F4ACBD;
+                    width: 90px;
+                    padding: 10px;
+                    border-radius: 10px;
+                    cursor: pointer;
+                }
+
+              
+            }
+    }
+    .second{
+        h3{
+            font-family: Plus Jakarta Sans;
+            font-size: 20px;
+        }
+
+        li{
+          list-style: none;
+          line-height: 40px;
+          cursor: pointer;
+          @include cd{
+            transition: all 0.5s ease-in-out;
+
+            &:hover{
+                transform: translateX(-20px);
+                }
+          }
+         
+          @include md{
+            padding-left: 20px;
+          }
+    
+          
+          
+         
+        }
+    }
+    .third{
+        h3{
+            font-family: Plus Jakarta Sans;
+            font-size: 20px;
+            
+        }
+
+        li{
+          list-style: none;
+          line-height: 40px;
+          cursor: pointer;
+          @include cd{
+            transition: all 0.5s ease-in-out;
+
+            &:hover{
+                transform: translateX(-20px);
+                }
+          }
+
+          @include md{
+            padding-right: 20px;
+          }
+        }
+    }
+    .last{
+        background-color: #F4ACBD;
+        height: 300px;
+        width: 72px;
+
+        @include md{
+            display: none;
+        }
+    }
+   }
+}
