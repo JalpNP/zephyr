@@ -8,13 +8,14 @@ import * as yup from 'yup';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import MyContext from '../Context/MyContext';
+import axios from 'axios';
 
 
 
 
 const Footer = () => {
 
-  const{setLoadingin,setMessage,setOpenalert} = useContext(MyContext)
+  const{setLoadingin,setMessage,setOpenalert,apiUrl} = useContext(MyContext)
 
   
   const formik = useFormik({
@@ -31,34 +32,33 @@ const Footer = () => {
 
     }),
     onSubmit: async (values, { resetForm }) => {
-      setLoadingin(true)
+      setLoadingin(true);
       try {
-
-
-        const response = await fetch("https://expressd.vercel.app/newlater", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(values),
-        });
-
-        const data = await response.json();
+        const { data } = await axios.post(
+          `${apiUrl}/newlater`,
+          values,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            }
+          }
+        );
+    
         if (data.success) {
           setOpenalert(true);
-          setMessage(data.message)
-           resetForm();
-
+          setMessage(data.message);
+          resetForm();
         } else {
           setOpenalert(true);
-          setMessage(data.error)
+          setMessage(data.error);
         }
       } catch (error) {
-        alert(error.message)
+        alert(error.response ? error.response.data.error : error.message);
       } finally {
-        setLoadingin(false)
+        setLoadingin(false);
       }
     },
+    
 
   });
     

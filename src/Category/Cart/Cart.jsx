@@ -1,38 +1,41 @@
 import React, { useContext, useEffect, useState } from 'react';
 import MyContext from '../../Context/MyContext';
 import './Cart.scss';
+import axios from 'axios';
 
 const Cart = () => {
-  const { cart, setCart,removeProductFromCart,handleIncreaseQuantity,handleDecreaseQuantity,TotalValue,token } = useContext(MyContext);
+  const { cart, setCart,apiUrl,removeProductFromCart,handleIncreaseQuantity,handleDecreaseQuantity,TotalValue,token } = useContext(MyContext);
   const[loading,setLoading] = useState(true)
 
   // for cartitems fetching start
-useEffect(() => {
+  useEffect(() => {
+  
+  
+    const fetchCartItems = async () => {
 
-  if(!token){
-    return 
-  }
-  const fetchCartItems = async () => {
-    try {
-      const response = await fetch('https://expressd.vercel.app/cart', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-    
-      const data = await response.json();
-      setCart(data.cartInfo);
-      sessionStorage.setItem('cart', JSON.stringify(data.cartInfo));
-    } catch (error) {
-      alert('please try again')
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  fetchCartItems();
-}, [setCart,token]);
+      if (!token) {
+        setLoading(false);
+        return;
+      }
+      try {
+        const { data } = await axios.get(`${apiUrl}/cart`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+  
+        setCart(data.cartInfo);
+        sessionStorage.setItem('cart', JSON.stringify(data.cartInfo));
+      }  catch (error) {
+        console.error('Failed to fetch cart details:', error.response?.data?.error || error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+  
+    fetchCartItems();
+  }, [token,apiUrl,setCart]); 
+  
 // for cartitems fetching end
   
 

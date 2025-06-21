@@ -14,7 +14,7 @@ const SingleProduct = () => {
     const{product}=useParams()
     const{single}=useParams()
 
-    const {isProductInCart,isProductInWish,handlewish,loadingin,handletime,api,handleimg,issize,handleCart,showSize,size,setShow,handleMouseMove,show,cursorPosition,big,shareToWhatsApp,shareToLinkedIn,shareToTwitter} = useContext(MyContext)
+    const {isProductInCart,isProductInWish,handlewish,handletime,api,handleimg,issize,handleCart,showSize,size,setShow,handleMouseMove,show,cursorPosition,big,shareToWhatsApp,shareToLinkedIn,shareToTwitter} = useContext(MyContext)
   return (
   <>
 
@@ -90,12 +90,12 @@ const SingleProduct = () => {
                         <div class="btn">
                       {  !isProductInCart(o.id,i.id)?
                         
-                          <button onClick={()=>handleCart(o.id,i.id,i.productimg,i.productname,i.productprice)}>{loadingin?'ADDING...':'Add to Cart'} </button>:
+                          <button onClick={()=>handleCart(o.id,i.id,i.productimg,i.productname,i.productprice)}>Add to Cart</button>:
                           <button onClick={() => window.location.href='/cart'}>Go To Cart </button>
                       }
 
                       {  !isProductInWish(o.id,i.id)?
-                          <button onClick={()=>handlewish(o.id,i.id,i.productimg,i.productname,i.productprice)}><span><FavoriteIcon/></span>{loadingin?'ADDING...':'Add to Wishlist'}</button>:
+                          <button onClick={()=>handlewish(o.id,i.id,i.productimg,i.productname,i.productprice)}><span><FavoriteIcon/></span>Add to Wishlist</button>:
                           <button onClick={() => window.location.href='/wish'}>Go To Wish </button>
                       }
                         </div>

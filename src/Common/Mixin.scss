@@ -1,4 +1,8 @@
-
+@mixin M400{
+    @media only screen and (max-width: 400px) {
+        @content;
+    }
+}
     @mixin md {
         @media only screen and (max-width: 768px) {
         @content;

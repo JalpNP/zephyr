@@ -4,36 +4,40 @@ import * as Yup from 'yup';
 import './Checkout.scss';
 import LoginError from '../Profile/LoginError/LoginError';
 import MyContext from '../Context/MyContext';
+import axios from 'axios';
 
 const Checkout = ({show}) => {
-  const { edit, setEdit, token, shipping, setShipping, loadingin, setLoadingin, setOpenalert, setMessage } = useContext(MyContext);
+  const {apiUrl, edit, setEdit, token, shipping, setShipping, loadingin, setLoadingin, setOpenalert, setMessage } = useContext(MyContext);
   const [loader, setLoader] = useState(true);
 
   useEffect(() => {
-    if(!token){
-      setLoader(false)
-      return
-     
-    }
+  
+  
     const fetchShippingData = async () => {
+
+      if (!token) {
+        setLoader(false);
+        return;
+      }
       try {
-        const response = await fetch('https://expressd.vercel.app/get-user-address', {
+        const { data } = await axios.get(`${apiUrl}/get-user-address`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
-        const data = await response.json();
+  
         setShipping(data.shippingInfo);
         sessionStorage.setItem('shipping', JSON.stringify(data.shippingInfo));
       } catch (error) {
-        console.error('Failed to fetch account details:', error);
+        console.error('Failed to fetch shipping details:', error.response?.data?.error || error.message);
       } finally {
         setLoader(false);
       }
     };
-
+  
     fetchShippingData();
-  }, [setShipping, token]);
+  }, [token, apiUrl, setShipping]);
+  
 
   if (loader) {
     return <div>Loading...</div>;
@@ -66,31 +70,38 @@ const Checkout = ({show}) => {
             })}
             onSubmit={async (values) => {
               setLoadingin(true);
-              const response = await fetch('https://expressd.vercel.app/save-shipping-info', {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                  Authorization: `Bearer ${token}`,
-                },
-                body: JSON.stringify(values),
-              });
-
-              const data = await response.json();
-
-              if (data.success) {
-                setOpenalert(true);
-                setMessage(data.message);
-                setShipping(data.shippingInfo);
-                sessionStorage.setItem('shipping', JSON.stringify(data.shippingInfo));
-                setTimeout(() => {
-                  window.location.reload();
-                }, 2000);
-              } else {
-                setOpenalert(true);
-                setMessage(data.error);
+            
+              try {
+                const { data } = await axios.post(
+                  `${apiUrl}/save-shipping-info`,
+                  values,
+                  {
+                    headers: {
+                      'Content-Type': 'application/json',
+                      Authorization: `Bearer ${token}`,
+                    },
+                  }
+                );
+            
+                if (data.success) {
+                  setOpenalert(true);
+                  setMessage(data.message);
+                  setShipping(data.shippingInfo);
+                  sessionStorage.setItem('shipping', JSON.stringify(data.shippingInfo));
+                  setTimeout(() => {
+                    window.location.reload();
+                  }, 2000);
+                } else {
+                  setOpenalert(true);
+                  setMessage(data.error);
+                }
+              } catch (error) {
+                console.error('Failed to save shipping info:', error.response?.data?.error || error.message);
+              } finally {
+                setLoadingin(false);
               }
-              setLoadingin(false);
             }}
+            
           >
             {({ isSubmitting }) => (
               <Form className='ship-main'>

@@ -1,38 +1,41 @@
 import React, { useContext, useEffect, useState } from 'react';
 import './Order.scss';
 import MyContext from '../Context/MyContext';
+import axios from 'axios';
 
 const Order = () => {
-  const { order, setOrder, token } = useContext(MyContext);
+  const {apiUrl, order, setOrder, token } = useContext(MyContext);
   const [loading, setLoading] = useState(true);
 
   // Fetch order items on component mount
   useEffect(() => {
-
-    if(!token){
-      return 
-    }
+ 
+  
     const fetchOrderItems = async () => {
+
+      if (!token) {
+        setLoading(false);
+        return;
+      }
       try {
-        const response = await fetch('https://expressd.vercel.app/order', {
+        const { data } = await axios.get(`${apiUrl}/order`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
-
-     
-        const data = await response.json();
+  
         setOrder(data.orderInfo);
         sessionStorage.setItem('order', JSON.stringify(data.orderInfo));
       } catch (error) {
-        alert('Please try again');
+        console.error('Failed to fetch order details:', error.response?.data?.error || error.message);
       } finally {
         setLoading(false);
       }
     };
-
+  
     fetchOrderItems();
-  }, [setOrder, token]);
+  }, [token, apiUrl, setOrder]);
+  
 
 
 

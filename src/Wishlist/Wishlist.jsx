@@ -1,38 +1,39 @@
 import React, { useContext, useEffect, useState } from 'react';
 import './Wishlist.scss';
+import axios from 'axios';
 import MyContext from '../Context/MyContext';
 
 const Wishlist = () => {
-  const { wish, setWish, removeProductFromWish, token } = useContext(MyContext);
+  const {apiUrl, wish, setWish, removeProductFromWish, token } = useContext(MyContext);
   const [loading, setLoading] = useState(true);
 
   // for wish items fetching start
   useEffect(() => {
-    if(!token){
-      setLoading(false)
-      return 
-      
-    }
-    const fetchCartItems = async () => {
+    const fetchWishItems = async () => {
+      if (!token) {
+        setLoading(false);
+        return;
+      }
+  
       try {
-        const response = await fetch('https://expressd.vercel.app/wish', {
+        const { data } = await axios.get(`${apiUrl}/wish`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
-      
-        const data = await response.json();
+  
         setWish(data.wishInfo);
         sessionStorage.setItem('wish', JSON.stringify(data.wishInfo));
       } catch (error) {
-       alert('error')
+        console.error('Failed to fetch wish details:', error.response?.data?.error || error.message);
       } finally {
         setLoading(false);
       }
     };
-
-    fetchCartItems();
-  }, [setWish, token]);
+  
+    fetchWishItems();
+  }, [token, apiUrl, setWish]);
+  
   // for wish items fetching end
 
   if (loading) {

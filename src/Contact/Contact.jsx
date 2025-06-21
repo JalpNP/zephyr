@@ -6,6 +6,7 @@ import { Button,} from '@mui/material';
 import { CiMail } from "react-icons/ci";
 import { IoPhonePortraitOutline } from "react-icons/io5";
  import MyContext from '../Context/MyContext';
+import axios from 'axios';
 
 
 
@@ -14,7 +15,7 @@ const Contact = () => {
   
  
  
-const {setOpenalert,setLoadingin,setMessage} = useContext(MyContext)
+const {setOpenalert,apiUrl,setLoadingin,setMessage} = useContext(MyContext)
 
 
 
@@ -42,30 +43,35 @@ const {setOpenalert,setLoadingin,setMessage} = useContext(MyContext)
         .required('**Message is Required')
      
     }),
-    onSubmit: async (values,  { resetForm }) => {
-     
-      setLoadingin(true)
-  
-   const response =   await fetch('https://expressd.vercel.app/contact', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(values),
-      });
-
-      const data = await response.json();
-
-      if(data.go==='success'){
-     setMessage(data.message)
-     setOpenalert(true)
-      }else{
-        setMessage(data.error)
-        setOpenalert(true)
+    onSubmit: async (values, { resetForm }) => {
+      setLoadingin(true);
+      try {
+        const { data } = await axios.post(
+          `${apiUrl}/contact`,
+          values,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+            }
+          }
+        );
+    
+        if (data.go === 'success') {
+          setMessage(data.message);
+          setOpenalert(true);
+        } else {
+          setMessage(data.error);
+          setOpenalert(true);
+        }
+      } catch (error) {
+        setMessage(error.response ? error.response.data.error : 'An error occurred');
+        setOpenalert(true);
+      } finally {
+        setLoadingin(false);
+        resetForm();
       }
-      setLoadingin(false)
-      resetForm()
     },
+    
   });
   return (
       

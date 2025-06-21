@@ -6,9 +6,10 @@ import EmailIcon from '@mui/icons-material/Email';
 import LockIcon from '@mui/icons-material/Lock';
 import { InputAdornment, TextField } from '@mui/material';
 import MyContext from '../Context/MyContext';
+import axios from 'axios';
 
 const Login = () => {
-  const { setLoadingin, loadingin, openregister, handleLogin, setMessage, setOpenalert } = useContext(MyContext);
+  const { apiUrl,setLoadingin, loadingin, openregister, handleLogin, setMessage, setOpenalert } = useContext(MyContext);
 
   const formik = useFormik({
     initialValues: {
@@ -27,26 +28,33 @@ const Login = () => {
     }),
     onSubmit: async (values, { resetForm }) => {
       setLoadingin(true);
-      const response = await fetch("https://expressd.vercel.app/login", {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(values),
-      });
-
-      const data = await response.json();
-
-      if (data.go === 'success') {
-        handleLogin(data);
-        resetForm();
-      } else {
-        setMessage(data.loginerror);
+      try {
+        const { data } = await axios.post(
+          `${apiUrl}/login`,
+          values,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+            }
+          }
+        );
+    
+        if (data.go === 'success') {
+          handleLogin(data);
+          resetForm();
+        } else {
+          setMessage(data.loginerror);
+          setOpenalert(true);
+        }
+      } catch (error) {
+        setMessage(error.response ? error.response.data.error : 'An error occurred');
         setOpenalert(true);
+      } finally {
+        setLoadingin(false);
       }
-
-      setLoadingin(false);
     },
+    
+    
   });
 
   return (

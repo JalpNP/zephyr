@@ -5,9 +5,10 @@ import * as yup from 'yup';
 import { InputAdornment, TextField } from '@mui/material';
 import { AccountCircle, EmailOutlined, Password, PhoneAndroid } from '@mui/icons-material';
 import MyContext from '../Context/MyContext';
+import axios from 'axios';
 
 const Register = () => {
-  const { openregister, setOpenalert, setLoadingin, setMessage } = useContext(MyContext);
+  const { apiUrl,openregister, setOpenalert, setLoadingin, setMessage } = useContext(MyContext);
 
   const formik = useFormik({
     initialValues: {
@@ -37,28 +38,34 @@ const Register = () => {
     }),
     onSubmit: async (values, { resetForm }) => {
       setLoadingin(true);
-      const response = await fetch('https://expressd.vercel.app/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(values),
-      });
-
-      const data = await response.json();
-
-      if (data.go === 'success') {
-        setMessage(data.registermessage);
+      try {
+        const { data } = await axios.post(
+          `${apiUrl}/register`,
+          values,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+            }
+          }
+        );
+    
+        if (data.go === 'success') {
+          setMessage(data.registermessage);
+          setOpenalert(true);
+          openregister();
+          resetForm();
+        } else {
+          setMessage(data.registererror);
+          setOpenalert(true);
+        }
+      } catch (error) {
+        setMessage(error.response ? error.response.data.error : 'An error occurred');
         setOpenalert(true);
-        openregister();
-        resetForm();
-      } else {
-        setMessage(data.registererror);
-        setOpenalert(true);
+      } finally {
+        setLoadingin(false);
       }
-
-      setLoadingin(false);
     },
+    
   });
 
   return (

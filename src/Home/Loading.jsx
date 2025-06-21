@@ -5,11 +5,11 @@ import MyContext from '../Context/MyContext'
 
 const Loading = () => {
 
-    const {loadingin} = useContext(MyContext)
+    const {loadingin,apiloader} = useContext(MyContext)
   return (
 <>
     {
-loadingin &&
+(loadingin||apiloader) &&
     <div class="container-boxx">
     <div class="box">
         <div class="front-box"></div>

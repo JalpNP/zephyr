@@ -2,34 +2,43 @@ import React, { useContext, useEffect, useState } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import './Account.scss';
+import axios from 'axios';
 import MyContext from '../../Context/MyContext';
 import LoginError from '../LoginError/LoginError';
 
 const Account = () => {
-  const { edit, setEdit,token, userdata, setUserdata, loadingin, setLoadingin, setOpenalert, setMessage } = useContext(MyContext);
+  const { apiUrl,edit, setEdit,token, userdata, setUserdata, loadingin, setLoadingin, setOpenalert, setMessage } = useContext(MyContext);
   const [loader, setLoader] = useState(true);
  
 
   useEffect(() => {
+
+  
     const fetchUserData = async () => {
+
+      if (!token) {
+        setLoader(false);
+        return;
+      }
       try {
-        const response = await fetch('https://expressd.vercel.app/api/account-details', {
+        const { data } = await axios.get(`${apiUrl}/api/account-details`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
-        const data = await response.json();
+  
         setUserdata(data.accountInfo);
         sessionStorage.setItem('userdata', JSON.stringify(data.accountInfo));
       } catch (error) {
-        console.error('Failed to fetch account details:', error);
+        console.error('Failed to fetch account details:', error.response?.data?.error || error.message);
       } finally {
         setLoader(false);
       }
     };
-
+  
     fetchUserData();
-  }, [setUserdata, token]);
+  }, [token, apiUrl, setUserdata]);
+  
 
   if (loader) {
     return <div>Loading...</div>;
@@ -54,31 +63,40 @@ const Account = () => {
             })}
             onSubmit={async (values) => {
               setLoadingin(true);
-              const response = await fetch('https://expressd.vercel.app/update-account-data', {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                  Authorization: `Bearer ${token}`,
-                },
-                body: JSON.stringify(values),
-              });
-
-              const data = await response.json();
-
-              if (data.success) {
+            
+              try {
+                const { data } = await axios.post(
+                  `${apiUrl}/update-account-data`,
+                  values,
+                  {
+                    headers: {
+                      'Content-Type': 'application/json',
+                      Authorization: `Bearer ${token}`,
+                    },
+                  }
+                );
+            
+                if (data.success) {
+                  setOpenalert(true);
+                  setMessage(data.message);
+                  setUserdata(data.accountInfo);
+                  sessionStorage.setItem('userdata', JSON.stringify(data.accountInfo));
+                  setTimeout(() => {
+                    window.location.reload();
+                  }, 2000);
+                } else {
+                  setOpenalert(true);
+                  setMessage(data.error);
+                }
+              } catch (error) {
+                console.error('Failed to update account data:', error.response?.data?.error || error.message);
                 setOpenalert(true);
-                setMessage(data.message);
-                setUserdata(data.accountInfo);
-                sessionStorage.setItem('userdata', JSON.stringify(data.accountInfo));
-                setTimeout(() => {
-                  window.location.reload()
-                }, 2000);
-              } else {
-                setOpenalert(true);
-                setMessage(data.error);
+                setMessage('An error occurred. Please try again.');
+              } finally {
+                setLoadingin(false);
               }
-              setLoadingin(false);
             }}
+            
           >
             {({ isSubmitting }) => (
               <Form className='name-main'>
@@ -91,7 +109,7 @@ const Account = () => {
                   </div>
                   <div className='name-input'>
                     <label htmlFor="email">Email:</label>
-                    <Field type="text" name="email" />
+                    <Field type="text" name="email" disabled/>
                     <ErrorMessage name="email" component="div" className="error-message" />
                   </div>
                   <div className='name-input'>

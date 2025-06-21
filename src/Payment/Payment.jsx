@@ -1,36 +1,64 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import MyContext from '../Context/MyContext';
 import './Payment.scss';
 import LoginError from '../Profile/LoginError/LoginError';
 
 const Payment = () => {
-  const {token,TotalValue,captcha, handleRefresh, handleSubmit, enter, setEnter, error } = useContext(MyContext);
+
+  
+  const {
+    loadingin,
+    token,
+    TotalValue,
+    handleupi,
+  
+  } = useContext(MyContext);
+
+  
+  const [open, setOpen] = useState(false);
+
+  const handleOptionChange = () => {
+
+    setOpen(true);
+  };
 
   return (
-<>
-    {token ?
-    <div className="payment-container">
-    <h3>Total Value: ${TotalValue}</h3>
-      <div className="captcha-box">
-        {captcha}
-      </div>
-      <input
-      type="text"
-      value={enter}
-      onChange={(e) => setEnter(e.target.value)}
-      placeholder="Enter captcha"
-      className="captcha-input"
-    />
-      <button className="refresh-button" onClick={handleRefresh}>Refresh</button>
-      
-    
-      {error && <div className="error-message">invalid captcha </div>}
-      <br />
-      <button className="submit-button" onClick={handleSubmit}>Place Order</button>
-    
-    </div>:
-    <LoginError title="Patment information" />
-    }
+    <>
+      {token ? (
+        <div className="pay_one">
+          <h1>Select Payment Option</h1>
+          <p>Total Price: ${TotalValue}</p>
+
+          <div className="select">
+           
+
+            <div className="first">
+              <label>
+                <input
+                  type="radio"
+                  value="online"
+                  onChange={handleOptionChange}
+                />
+                Pay online
+                
+              </label>
+              { open && (
+                <div className="upi">
+                  <button
+                    type="submit"
+                    disabled={loadingin}
+                    onClick={handleupi}
+                  >
+                    {loadingin ? "Processing..." : "Pay online"}
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      ) : (
+        <LoginError title="Payment information" />
+      )}
     </>
   );
 };

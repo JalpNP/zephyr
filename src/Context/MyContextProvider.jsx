@@ -6,13 +6,27 @@ import axios from 'axios';
 
 const MyContextProvider = ({children}) => {
 
-
+  const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:3034';
        //for api calling start
+
+ const[apiloader,setApiloader]=useState(true)
 const[api,setApi] = useState([])
-useEffect(() =>{
-  axios.get('https://expressd.vercel.app/api/data')
-  .then((a) =>setApi(a.data.data))
-},[])
+
+useEffect(() => {
+  
+  const fetchData = async () => {
+    try {
+      const response = await axios.get(`${apiUrl}/api/data`);
+      setApi(response.data.data)
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    } finally {
+      setApiloader(false);
+    }
+  };
+
+  fetchData();
+}, [apiUrl]);
 // for api calling end
 
 
@@ -211,164 +225,159 @@ const [cart, setCart] = useState(() => {
 
 
 // FOR ADD TO CART PROCESS START
-const handleCart = async(categoryid,productid,productimg,productname,productprice) =>{
-  if(!token){
-setMessage('please login first')
-setOpenalert(true)
-setTimeout(() => {
-handleLoginOpen()
-}, (3000));
-return;
+const handleCart = async (categoryid, productid, productimg, productname, productprice) => {
+  if (!token) {
+    setMessage('Please login first');
+    setOpenalert(true);
+    setTimeout(() => {
+      handleLoginOpen();
+    }, 3000);
+    return;
   }
 
-  if(!size){
-   setIssize(true)
-   return
+  if (!size) {
+    setIssize(true);
+    return;
   }
 
-   setLoadingin(true)
-   const response = await fetch('https://expressd.vercel.app/add-to-cart', {
-     method: 'POST',
-     headers: {
-       'Content-Type': 'application/json',
-       'Authorization': `Bearer ${token}`
-     },
-     body: JSON.stringify({categoryid,productid,productimg,productname,productprice,size})
-   })
+  setLoadingin(true);
 
-   const data = await response.json()
+  try {
+    const { data } = await axios.post(
+      `${apiUrl}/add-to-cart`,
+      { categoryid, productid, productimg, productname, productprice, size },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
 
-   if(data.success){
-     setMessage(data.message)
-     sessionStorage.setItem('cart', JSON.stringify(data.cartInfo));
-     setCart(data.cartInfo)
-     setOpenalert(true)
-     setSize('')
-   }else{
-     setMessage(data.error)
-     setOpenalert(true)
-     setSize('')
-   }
-   setLoadingin(false)
-  
- }
+    if (data.success) {
+      setMessage(data.message);
+      sessionStorage.setItem('cart', JSON.stringify(data.cartInfo));
+      setCart(data.cartInfo);
+      setOpenalert(true);
+      setSize('');
+    } else {
+      setMessage(data.error);
+      setOpenalert(true);
+      setSize('');
+    }
+  } catch (error) {
+    console.error('Error adding to cart:', error.response ? error.response.data.error : error.message);
+    setMessage('An error occurred. Please try again.');
+    setOpenalert(true);
+  } finally {
+    setLoadingin(false);
+  }
+};
+
 
  // FOR ADD TO CART PROCESS end
 
 
  // remove product from cart start
 
-const removeProductFromCart = async (categoryid,productid,size) => {
+ const removeProductFromCart = async (categoryid, productid, size) => {
   try {
+    setLoadingin(true);
+    const { data } = await axios.post(`${apiUrl}/remove-from-cart`, 
+      { categoryid, productid, size },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      }
+    );
 
-    setLoadingin(true)
-    const response = await fetch('https://expressd.vercel.app/remove-from-cart', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify({ categoryid,productid,size })
-    });
-
-    const data = await response.json();
-    if(data.success){
-      setMessage(data.message)
+    if (data.success) {
+      setMessage(data.message);
       sessionStorage.setItem('cart', JSON.stringify(data.cartInfo));
-      setCart(data.cartInfo)
-      setOpenalert(true)
-  
-    }else{
-      setMessage(data.error)
-      setOpenalert(true)
-   
+      setCart(data.cartInfo);
+      setOpenalert(true);
+    } else {
+      setMessage(data.error);
+      setOpenalert(true);
     }
-    
-    
   } catch (error) {
-    console.error('Error removing from cart:', error);
-    // Handle error
-  }finally{
-    setLoadingin(false)
+    console.error('Error removing from cart:', error.response ? error.response.data.error : error.message);
+  } finally {
+    setLoadingin(false);
   }
 };
+
 // remove product from cart end
 
 
 // for increase quantity in cart start
-const handleIncreaseQuantity = async (categoryid,productid,size) => {
+const handleIncreaseQuantity = async (categoryid, productid, size) => {
   try {
+    setLoadingin(true);
 
-    setLoadingin(true)
-    const response = await fetch('https://expressd.vercel.app/increase-quantity', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify({ categoryid,productid,size })
-    });
+    const { data } = await axios.post(`${apiUrl}/increase-quantity`, 
+      { categoryid, productid, size },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      }
+    );
 
-    const data = await response.json();
-    if(data.success){
-      setMessage(data.message)
+    if (data.success) {
+      setMessage(data.message);
       sessionStorage.setItem('cart', JSON.stringify(data.cartInfo));
-      setCart(data.cartInfo)
-      setOpenalert(true)
-   
-    }else{
-      setMessage(data.error)
-      setOpenalert(true)
-     
+      setCart(data.cartInfo);
+      setOpenalert(true);
+    } else {
+      setMessage(data.error);
+      setOpenalert(true);
     }
-    
-    
   } catch (error) {
-    console.error('Error removing from cart:', error);
-    // Handle error
-  }finally{
-    setLoadingin(false)
+    console.error('Error increasing quantity:', error.response ? error.response.data.error : error.message);
+  } finally {
+    setLoadingin(false);
   }
 };
+
 
 // for increase quantity in cart end
 
 
 // for decrease quantity in cart start
-const handleDecreaseQuantity = async (categoryid,productid,size) => {
+const handleDecreaseQuantity = async (categoryid, productid, size) => {
   try {
+    setLoadingin(true);
 
-    setLoadingin(true)
-    const response = await fetch('https://expressd.vercel.app/decrease-quantity', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify({ categoryid,productid,size })
-    });
+    const { data } = await axios.post(`${apiUrl}/decrease-quantity`, 
+      { categoryid, productid, size },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      }
+    );
 
-    const data = await response.json();
-    if(data.success){
-      setMessage(data.message)
+    if (data.success) {
+      setMessage(data.message);
       sessionStorage.setItem('cart', JSON.stringify(data.cartInfo));
-      setCart(data.cartInfo)
-      setOpenalert(true)
-    
-    }else{
-      setMessage(data.error)
-      setOpenalert(true)
-    
+      setCart(data.cartInfo);
+      setOpenalert(true);
+    } else {
+      setMessage(data.error);
+      setOpenalert(true);
     }
-    
-    
   } catch (error) {
-    console.error('Error removing from cart:', error);
-    // Handle error
-  }finally{
-    setLoadingin(false)
+    console.error('Error decreasing quantity:', error.response ? error.response.data.error : error.message);
+  } finally {
+    setLoadingin(false);
   }
 };
+
 
 // for decrease quantity in cart end
 
@@ -397,43 +406,45 @@ const [wish, setWish] = useState(() => {
 
 
 // FOR ADD TO Wish PROCESS START
-const handlewish = async(categoryid,productid,productimg,productname,productprice) =>{
-  if(!token){
-setMessage('please login first')
-setOpenalert(true)
-setTimeout(() => {
-handleLoginOpen()
-}, (3000));
-return;
+const handlewish = async (categoryid, productid, productimg, productname, productprice) => {
+  if (!token) {
+    setMessage('Please login first');
+    setOpenalert(true);
+    setTimeout(() => {
+      handleLoginOpen();
+    }, 3000);
+    return;
   }
 
-
-   setLoadingin(true)
-   const response = await fetch('https://expressd.vercel.app/add-to-wish', {
-     method: 'POST',
-     headers: {
-       'Content-Type': 'application/json',
-       'Authorization': `Bearer ${token}`
-     },
-     body: JSON.stringify({categoryid,productid,productimg,productname,productprice})
-   })
-
-   const data = await response.json()
-
-   if(data.success){
-     setMessage(data.message)
-     sessionStorage.setItem('wish', JSON.stringify(data.wishInfo));
-     setWish(data.wishInfo)
-     setOpenalert(true)
-
-   }else{
-     setMessage(data.error)
-     setOpenalert(true)
-   
-   }
-   setLoadingin(false)
+  setLoadingin(true);
   
- }
+  try {
+    const { data } = await axios.post(`${apiUrl}/add-to-wish`, 
+      { categoryid, productid, productimg, productname, productprice },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      }
+    );
+
+    if (data.success) {
+      setMessage(data.message);
+      sessionStorage.setItem('wish', JSON.stringify(data.wishInfo));
+      setWish(data.wishInfo);
+      setOpenalert(true);
+    } else {
+      setMessage(data.error);
+      setOpenalert(true);
+    }
+  } catch (error) {
+    console.error('Error adding to wishlist:', error.response ? error.response.data.error : error.message);
+  } finally {
+    setLoadingin(false);
+  }
+};
+
 
  // FOR ADD TO Wish PROCESS end
 
@@ -441,40 +452,37 @@ return;
 
   // remove product from cart start
 
-const removeProductFromWish = async (categoryid,productid) => {
-  try {
-
-    setLoadingin(true)
-    const response = await fetch('https://expressd.vercel.app/remove-from-wish', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify({ categoryid,productid })
-    });
-
-    const data = await response.json();
-    if(data.success){
-      setMessage(data.message)
-      sessionStorage.setItem('wish', JSON.stringify(data.wishInfo));
-      setWish(data.wishInfo)
-      setOpenalert(true)
-    
-    }else{
-      setMessage(data.error)
-      setOpenalert(true)
-     
+  const removeProductFromWish = async (categoryid, productid) => {
+    try {
+      setLoadingin(true);
+  
+      const { data } = await axios.post(
+        `${apiUrl}/remove-from-wish`,
+        { categoryid, productid },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        }
+      );
+  
+      if (data.success) {
+        setMessage(data.message);
+        sessionStorage.setItem('wish', JSON.stringify(data.wishInfo));
+        setWish(data.wishInfo);
+        setOpenalert(true);
+      } else {
+        setMessage(data.error);
+        setOpenalert(true);
+      }
+    } catch (error) {
+      console.error('Error removing from wish:', error.response ? error.response.data.error : error.message);
+    } finally {
+      setLoadingin(false);
     }
-    
-    
-  } catch (error) {
-    console.error('Error removing from wish:', error);
-    // Handle error
-  }finally{
-    setLoadingin(false)
-  }
-};
+  };
+  
 // remove product from cart end
 
 
@@ -563,7 +571,7 @@ document.getElementById('imgpp').src=img
     
 // for order list  start
 const [order, setOrder] = useState(() => {
-  const savedorder = sessionStorage.getItem('wish');
+  const savedorder = sessionStorage.getItem('order');
   return savedorder ? JSON.parse(savedorder) : [];
 });
 // for order list  end
@@ -573,107 +581,150 @@ const [order, setOrder] = useState(() => {
 // for payment option start\
 
 
-const  generateCaptcha = () =>{
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  let result = '';
-  for (let i = 0; i < 6; i++) {
-    result += characters.charAt(Math.floor(Math.random() * characters.length));
-  }
-  return result;
-}
-    const [captcha, setCaptcha] = useState(generateCaptcha());
-    const [enter, setEnter] = useState('');
-    const [error, setError] = useState(false);
 
-  
-  
-    const handleRefresh = () => {
-      setCaptcha(generateCaptcha());
-      setEnter('')
-      setError(false)
-    };
-  
-    const handleSubmit = async () => {
-      if (enter === captcha) {
-        setEnter('');
-        setLoadingin(true);
-    
-        try {
-          const response = await fetch('https://expressd.vercel.app/add-to-order', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify({ orderDate: new Date() })
-          });
-    
-          const data = await response.json();
-    
-          if (data.success) {
-            setMessage(data.message);
-            sessionStorage.setItem('cart', JSON.stringify(data.cartInfo));
-            sessionStorage.setItem('order', JSON.stringify(data.orderInfo));
-            setCart(data.cartInfo);
-            setOrder(data.orderInfo);
-            setOpenalert(true);
-            window.location.href='/confirm'
-          } else {
-            setMessage(data.error);
-            setOpenalert(true);
-          }
-        } catch (error) {
-          console.error('Error during order submission:', error);
-          setMessage('An error occurred while processing your order. Please try again.');
-          setOpenalert(true);
-        } finally {
-          setLoadingin(false);
+
+
+const handlepay = async () => {
+  try {
+    const { data } = await axios.post(
+      `${apiUrl}/add-to-order`,
+      { orderDate: new Date() },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
         }
-      } else {
-        setError(true);
-        setCaptcha(generateCaptcha());
+      }
+    );
+
+    if (data.success) {
+      setMessage(data.message);
+      sessionStorage.setItem('cart', JSON.stringify(data.cartInfo));
+      sessionStorage.setItem('order', JSON.stringify(data.orderInfo));
+      setCart(data.cartInfo);
+      setOrder(data.orderInfo);
+      setOpenalert(true);
+    } else {
+      setMessage(data.error);
+      setOpenalert(true);
+    }
+  } catch (error) {
+    console.error('Error during order submission:', error.response?.data?.error || error.message);
+  } finally {
+    setLoadingin(false);
+  }
+};
+
+    
+    const handleupi = async (e) => {
+      setLoadingin(true);
+    
+      try {
+        // Use axios to make the POST request
+        const {data} = await axios.post(`${apiUrl}/razorpay`, {
+          amount: TotalValue
+        }, {
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        });
+    
+      
+    
+        if (data.success !== true) {
+          setOpenalert(true);
+          setMessage(data.error);
+        } else {
+          const options = {
+            key: process.env.REACT_APP_RAZORPAY_KEY,
+            amount: data.amount,
+            currency: data.currency,
+            image: "https://i.ibb.co/wdj924Q/image-2024-08-18-074932280.png",
+            name: "ZEPHYR",
+            description: "Test Transaction",
+            order_id: data.id,
+            config: {
+              display: {
+                blocks: {
+                  utib: { 
+                    name: "most recommended using",
+                    instruments: [
+                      {
+                        method: "card",
+                        types: ["debit", "credit"]
+                      },
+                      {
+                        method: "upi",
+                        
+                      }
+                    ]
+                  },
+                
+                },
+                hide: [
+                  {
+                    method: "upi",
+                    flows: ["qr"]
+                  },
+
+                  {
+                    method: "wallet",
+                  
+                  },
+
+                  {
+                    method: "paylater",
+                  
+                  }
+                ],
+                sequence: ["block.utib", "block.other"],
+                preferences: {
+                  show_default_blocks: true
+                }
+              }
+            },
+            handler:async (response) => {
+              await handlepay(); 
+            Navigate('/confirm');
+            },
+            // modal: {
+            //   ondismiss: function () {
+            //     if (window.confirm("Are you sure you want to close the form?")) {
+            //       console.log("Checkout form closed by the user");
+            //     } else {
+            //       console.log("Complete the Payment");
+            //     }
+            //   }
+            // },
+            theme: {
+              color: "#F4ACBD",
+              hide_topbar: false,
+              shape: "rectangular",
+              header: {
+                color: "#fff",
+                text: "Payment"
+              }
+            }
+          };
+    
+          const rzp1 = new window.Razorpay(options);
+          rzp1.open();
+        }
+      } catch (error) {
+        alert(error.message);
+        console.error("Error during payment process:", error);
+      } finally {
+        setLoadingin(false);
       }
     };
     
-
-    // for payment option end
- 
-
-  
-    
-   
-  
-   
-
-
-   
- 
-
-
-
-
-
-     
-
-   
-
-
-
-      
-
-
- 
-
-
-      
-  
 
 
 
   return (
     <div>
 
-    <MyContext.Provider value={{order, setOrder,handleSubmit,handleRefresh,error, setError,enter, setEnter,captcha, setCaptcha,handlewish,TotalValue,shipping,setShipping,removeProductFromWish,isProductInWish,isProductInCart,wish,setWish,handleIncreaseQuantity,handleDecreaseQuantity,removeProductFromCart,edit, setEdit,userdata,setUserdata,cart,handleLogin, setCart,location,handletime,shareToWhatsApp,shareToLinkedIn,shareToTwitter ,big,setBig,handleMouseMove,show, setShow,cursorPosition, setCursorPosition,size,showSize,setSize,handleCart,issize,setIssize,handleSortChange,sortOrder,setSortOrder,handleimg,api,token,opensearch,setOpensearch,setToken,openalert,setOpenalert,Navigate,openregister ,handleLoginClose,openmodal,setOpenmodal,handleLoginOpen,showSignin,setShowSignin,
+    <MyContext.Provider value={{handleupi,order,apiloader,apiUrl,setOrder,handlewish,TotalValue,shipping,setShipping,removeProductFromWish,isProductInWish,isProductInCart,wish,setWish,handleIncreaseQuantity,handleDecreaseQuantity,removeProductFromCart,edit, setEdit,userdata,setUserdata,cart,handleLogin, setCart,location,handletime,shareToWhatsApp,shareToLinkedIn,shareToTwitter ,big,setBig,handleMouseMove,show, setShow,cursorPosition, setCursorPosition,size,showSize,setSize,handleCart,issize,setIssize,handleSortChange,sortOrder,setSortOrder,handleimg,api,token,opensearch,setOpensearch,setToken,openalert,setOpenalert,Navigate,openregister ,handleLoginClose,openmodal,setOpenmodal,handleLoginOpen,showSignin,setShowSignin,
             message,setMessage,handleLogout,
              input,setInput,loadingin,setLoadingin
             ,details,setDetails,

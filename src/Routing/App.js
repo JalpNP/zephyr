@@ -1,6 +1,6 @@
 import React from 'react'
 import './App.scss'
-import { BrowserRouter,Routes,Route } from 'react-router-dom'
+import { Routes,Route, HashRouter } from 'react-router-dom'
 import Home from '../Home/Home'
 import Header from '../Common/Header/Header'
 import Contact from '../Contact/Contact'
@@ -33,7 +33,7 @@ const App = () => {
   return (
 
 
-    <BrowserRouter>
+    <HashRouter>
 
       <MyContextProvider>
 
@@ -81,7 +81,7 @@ const App = () => {
       </MyContextProvider>
 
 
-    </BrowserRouter>
+    </HashRouter>
 
   )
 }
