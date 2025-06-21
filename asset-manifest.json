@@ -1,0 +1,24 @@
+{
+  "files": {
+    "main.css": "/zephyr/static/css/main.b7c6a0ee.css",
+    "main.js": "/zephyr/static/js/main.2a3a0ab8.js",
+    "static/js/453.99dcf01f.chunk.js": "/zephyr/static/js/453.99dcf01f.chunk.js",
+    "static/media/error.png": "/zephyr/static/media/error.a7fae29128e8f69935f0.png",
+    "static/media/slider6.jpg": "/zephyr/static/media/slider6.f4fcffce6a22a47da765.jpg",
+    "static/media/slider4.jpg": "/zephyr/static/media/slider4.407bab66ce1a044b88ca.jpg",
+    "static/media/slider3.jpg": "/zephyr/static/media/slider3.520b3f12e010ba325673.jpg",
+    "static/media/slider8.jpg": "/zephyr/static/media/slider8.65a5624342f3ef3f2939.jpg",
+    "static/media/slider2.jpg": "/zephyr/static/media/slider2.7ccbdc9629ed92df04c5.jpg",
+    "static/media/slider5.jpg": "/zephyr/static/media/slider5.65174beef6a2a3d38fc8.jpg",
+    "static/media/slider7.jpg": "/zephyr/static/media/slider7.9b50eda9de81a2e3713e.jpg",
+    "static/media/slider10.jpg": "/zephyr/static/media/slider10.2db0949474cd6c52e777.jpg",
+    "index.html": "/zephyr/index.html",
+    "main.b7c6a0ee.css.map": "/zephyr/static/css/main.b7c6a0ee.css.map",
+    "main.2a3a0ab8.js.map": "/zephyr/static/js/main.2a3a0ab8.js.map",
+    "453.99dcf01f.chunk.js.map": "/zephyr/static/js/453.99dcf01f.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.b7c6a0ee.css",
+    "static/js/main.2a3a0ab8.js"
+  ]
+}
